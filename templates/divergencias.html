@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Divergências{% endblock %}
+{% block conteudo %}
+<p class="muted">Cruzamento do cadastro de estoque com o OCS pela service tag. {{ alertas|length }} alerta(s).</p>
+<table>
+  <tr><th>Gravidade</th><th>Tipo</th><th>Service tag</th><th>Máquina (OCS)</th><th>Detalhe</th></tr>
+  {% for d in alertas %}
+  <tr>
+    <td><span class="tag {{ 'vermelho' if d.gravidade == 'alta' else 'amarelo' }}">{{ d.gravidade }}</span></td>
+    <td>{{ d.tipo }}</td><td>{{ d.service_tag or '—' }}</td><td>{{ d.maquina or '—' }}</td><td>{{ d.detalhe }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5">Nenhuma divergência. 🎉</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

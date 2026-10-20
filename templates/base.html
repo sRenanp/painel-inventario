@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>{% block titulo %}Painel de Inventário{% endblock %} · Painel de Inventário</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 0; background: #f4f6f9; color: #222; font-size: 14px; }
+    header { background: #1f4e78; color: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 24px; }
+    header h1 { font-size: 18px; margin: 0; }
+    header nav a { color: #dce8f5; text-decoration: none; margin-right: 16px; }
+    header nav a.ativo, header nav a:hover { color: #fff; font-weight: 600; }
+    header .fonte { margin-left: auto; font-size: 12px; background: #ffffff22; padding: 3px 8px; border-radius: 4px; }
+    main { padding: 20px 24px; }
+    table { border-collapse: collapse; width: 100%; background: #fff; }
+    th, td { border-bottom: 1px solid #e3e6ea; padding: 6px 8px; text-align: left; vertical-align: top; }
+    th { background: #eef2f7; position: sticky; top: 0; }
+    tr:hover td { background: #f8fafc; }
+    .num { text-align: right; }
+    .tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+    .verde { background: #d9f2e1; color: #1d6b3a; } .amarelo { background: #fff1c2; color: #7a5a00; }
+    .vermelho { background: #fbd9d9; color: #8a1f1f; } .cinza { background: #e6e8eb; color: #555; }
+    ul.up { margin: 0; padding-left: 16px; }
+    form.filtros { margin-bottom: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    input, select, button { font: inherit; padding: 4px 8px; }
+    button { cursor: pointer; }
+    .flash { padding: 8px 12px; margin-bottom: 12px; border-radius: 4px; }
+    .flash.ok { background: #d9f2e1; } .flash.erro { background: #fbd9d9; }
+    .cartao { background: #fff; padding: 14px; border-radius: 6px; margin-bottom: 16px; box-shadow: 0 1px 2px #0001; }
+    .muted { color: #777; font-size: 12px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Painel de Inventário</h1>
+  <nav>
+    {% set ep = request.endpoint %}
+    <a href="{{ url_for('maquinas') }}" class="{{ 'ativo' if ep == 'maquinas' }}">Memória por máquina</a>
+    <a href="{{ url_for('modelos') }}" class="{{ 'ativo' if ep == 'modelos' }}">Por modelo</a>
+    <a href="{{ url_for('compras') }}" class="{{ 'ativo' if ep == 'compras' }}">Compras</a>
+    <a href="{{ url_for('estoque_lista') }}" class="{{ 'ativo' if ep == 'estoque_lista' }}">Estoque</a>
+    <a href="{{ url_for('divergencias') }}" class="{{ 'ativo' if ep == 'divergencias' }}">Divergências</a>
+    <a href="{{ url_for('exportar_excel') }}">Exportar Excel</a>
+  </nav>
+  <span class="fonte">Fonte: {{ {'exemplo': 'dados de exemplo', 'csv': 'CSV', 'mysql': 'OCS (MySQL)'}.get(fonte, fonte) }}</span>
+</header>
+<main>
+  {% for cat, msg in get_flashed_messages(with_categories=true) %}
+    <div class="flash {{ cat }}">{{ msg }}</div>
+  {% endfor %}
+  {% block conteudo %}{% endblock %}
+</main>
+</body>
+</html>

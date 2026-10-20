@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titulo %}Erro{% endblock %}
+{% block conteudo %}
+<div class="cartao">
+  <h3 style="margin-top:0">Não foi possível carregar os dados</h3>
+  <p>{{ mensagem }}</p>
+  <p class="muted">Confira as variáveis no arquivo .env (PAINEL_FONTE, PAINEL_CSV, OCS_DB_*).
+    O cadastro de <a href="{{ url_for('estoque_lista') }}">estoque</a> continua acessível.</p>
+</div>
+{% endblock %}

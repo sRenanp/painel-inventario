@@ -1,0 +1,7 @@
+{
+  "_comentario": "Especificação de memória por modelo (usada para slots livres, upgrades e compras). 'conferido': false = valor ainda não confirmado no manual da Dell. max_por_slot_gb é opcional (padrão: max_gb / slots). categoria: notebook ou desktop.",
+  "Latitude 3540": { "categoria": "notebook", "slots": 2, "max_gb": 64, "tipo": "DDR4-3200 SODIMM", "conferido": false },
+  "Latitude 3420": { "categoria": "notebook", "slots": 2, "max_gb": 32, "tipo": "DDR4-3200 SODIMM", "conferido": false },
+  "Latitude 5420": { "categoria": "notebook", "slots": 2, "max_gb": 64, "tipo": "DDR4-3200 SODIMM", "conferido": false },
+  "OptiPlex 3080": { "categoria": "desktop", "slots": 2, "max_gb": 64, "tipo": "DDR4 (SODIMM no Micro, UDIMM no SFF/Torre)", "conferido": false }
+}

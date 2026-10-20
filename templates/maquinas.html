@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block titulo %}Memória por máquina{% endblock %}
+{% block conteudo %}
+<form class="filtros" method="get">
+  <input name="q" value="{{ busca }}" placeholder="Nome, service tag ou usuário">
+  <select name="modelo">
+    <option value="">Todos os modelos</option>
+    {% for m in modelos %}<option value="{{ m }}" {{ 'selected' if m == modelo }}>{{ m or '(sem modelo)' }}</option>{% endfor %}
+  </select>
+  <select name="filtro">
+    <option value="">Todas</option>
+    <option value="upgrade" {{ 'selected' if filtro == 'upgrade' }}>Só com upgrade possível</option>
+    <option value="livre" {{ 'selected' if filtro == 'livre' }}>Só com slot livre</option>
+  </select>
+  <button>Filtrar</button>
+  <span class="muted">{{ analises|length }} máquina(s)</span>
+</form>
+
+<table>
+  <tr>
+    <th>Máquina</th><th>Modelo</th><th>Service tag</th><th>Usuário</th>
+    <th>Pentes</th><th class="num">Qtd</th><th class="num">Total</th><th class="num">Slots livres</th>
+    <th class="num">Máx.</th><th>Upgrades possíveis</th><th>Último inventário</th>
+  </tr>
+  {% for a in analises %}{% set m = a.maquina %}
+  <tr>
+    <td>{{ m.nome }}</td>
+    <td>{{ m.modelo or '—' }}</td>
+    <td>{{ m.service_tag or '—' }}</td>
+    <td>{{ m.usuario }}</td>
+    <td>{{ a.config }}{% if a.tipo %}<div class="muted">{{ a.tipo }}</div>{% endif %}</td>
+    <td class="num">{{ a.pentes_gb|length }}</td>
+    <td class="num">{{ a.total_gb|gb }}</td>
+    <td class="num"><span class="tag {{ 'verde' if a.livres else 'cinza' }}">{{ a.livres }} de {{ a.slots }}</span></td>
+    <td class="num">{{ a.max_gb|gb }}{% if a.spec and not a.spec.conferido %} <span title="Limite ainda não conferido no manual da Dell">⚠</span>{% endif %}</td>
+    <td>
+      {% if not a.spec %}<span class="tag amarelo">Modelo sem especificação em modelos.json</span>
+      {% elif not a.upgrades %}<span class="tag verde">No máximo suportado</span>
+      {% else %}<ul class="up">{% for u in a.upgrades %}<li>{{ u|upgrade }}</li>{% endfor %}</ul>{% endif %}
+    </td>
+    <td>{{ m.ultimo_inventario.strftime('%d/%m/%Y %H:%M') if m.ultimo_inventario else '—' }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="11">Nenhuma máquina encontrada.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

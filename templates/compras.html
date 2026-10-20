@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block titulo %}Compras de memória{% endblock %}
+{% block conteudo %}
+<form class="filtros" method="get">
+  Meta:
+  <select name="meta">
+    {% for m in metas %}<option value="{{ m }}" {{ 'selected' if m == meta }}>{{ m }}GB por máquina</option>{% endfor %}
+  </select>
+  <select name="categoria">
+    <option value="notebook" {{ 'selected' if categoria == 'notebook' }}>Só notebooks</option>
+    <option value="desktop" {{ 'selected' if categoria == 'desktop' }}>Só desktops</option>
+    <option value="" {{ 'selected' if not categoria }}>Todos</option>
+  </select>
+  <select name="modelo">
+    <option value="">Todos os modelos</option>
+    {% for m in modelos %}<option value="{{ m }}" {{ 'selected' if m == modelo }}>{{ m or '(sem modelo)' }}</option>{% endfor %}
+  </select>
+  <button>Calcular</button>
+  <a href="{{ url_for('compras_exportar', meta=meta, categoria=categoria, modelo=modelo) }}">Exportar Excel</a>
+  <span class="muted">{{ qtd_maquinas }} máquina(s) no filtro</span>
+</form>
+
+<div class="cartao">
+  <h3 style="margin-top:0">Lista de compra para chegar a {{ meta }}GB
+    <span class="muted">· {{ plano.maquinas|length }} máquina(s) abaixo da meta · {{ plano.total_comprar }} pente(s) a comprar</span></h3>
+  <table>
+    <tr><th>Tipo</th><th class="num">Tamanho</th><th class="num">Necessários</th>
+        <th class="num">Reaproveitados das trocas</th><th class="num">Comprar</th><th class="num">Sobram</th></tr>
+    {% for l in plano.resumo %}
+    <tr>
+      <td>{{ l.tipo }}</td><td class="num">{{ l.gb|gb }}</td><td class="num">{{ l.necessarios }}</td>
+      <td class="num">{{ [l.necessarios, l.liberados]|min }}</td>
+      <td class="num"><b>{{ l.comprar }}</b></td>
+      <td class="num">{{ l.sobram or '' }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">Todas as máquinas do filtro já estão na meta.</td></tr>
+    {% endfor %}
+  </table>
+  <p class="muted">"Reaproveitados" são pentes retirados de máquinas onde é preciso trocar tudo (sem slot livre) e que
+    servem em outras do mesmo tipo de memória. "Sobram" são pentes retirados que não têm destino nessa meta.
+    {% if plano.sem_plano %}<br><b>{{ plano.sem_plano }} máquina(s) sem plano automático</b> (veja abaixo).{% endif %}</p>
+</div>
+
+<div class="cartao">
+  <h3 style="margin-top:0">Pentes instalados hoje <span class="muted">· {{ pentes.total }} no total</span></h3>
+  <table style="margin-bottom:12px">
+    <tr><th>Modelo</th>{% for t in pentes.tamanhos %}<th class="num">{{ t|gb }}</th>{% endfor %}<th class="num">Total</th></tr>
+    {% for modelo, c in pentes.por_modelo %}
+    <tr><td>{{ modelo }}</td>{% for t in pentes.tamanhos %}<td class="num">{{ c.get(t, 0) or '' }}</td>{% endfor %}
+        <td class="num"><b>{{ c.values()|sum }}</b></td></tr>
+    {% endfor %}
+  </table>
+  {% for (tipo, gb), n in pentes.por_tipo %}<span class="tag cinza">{{ tipo }} {{ gb|gb }}: {{ n }}</span> {% endfor %}
+</div>
+
+<div class="cartao">
+  <h3 style="margin-top:0">Por máquina</h3>
+  <table>
+    <tr><th>Máquina</th><th>Modelo</th><th>Usuário</th><th>Atual</th><th class="num">Alvo</th><th>Comprar</th><th>Retirar</th><th>Obs</th></tr>
+    {% for p in plano.maquinas %}{% set m = p.analise.maquina %}
+    <tr>
+      <td>{{ m.nome }}</td><td>{{ m.modelo }}</td><td>{{ m.usuario }}</td><td>{{ p.analise.config }}</td>
+      <td class="num">{{ p.alvo|gb }}</td>
+      <td>{{ p.comprar|map('gb')|join(' + ') if p.comprar else '—' }}</td>
+      <td>{{ p.liberados|map('gb')|join(' + ') if p.liberados else '' }}</td>
+      <td>{% if p.obs %}<span class="tag amarelo">{{ p.obs }}</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

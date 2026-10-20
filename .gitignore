@@ -1,0 +1,8 @@
+.env
+.venv/
+__pycache__/
+*.db
+*.xlsx
+# CSVs reais ficam fora do repositório; só o de exemplo é versionado
+*.csv
+!exemplos/*.csv

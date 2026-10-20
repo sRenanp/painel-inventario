@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block titulo %}Por modelo{% endblock %}
+{% block conteudo %}
+<div class="cartao">
+  <h3 style="margin-top:0">Configuração de memória por modelo</h3>
+  <table>
+    <tr><th>Modelo</th><th class="num">Total</th><th>Pentes</th><th class="num">Slots livres</th><th class="num">Máquinas</th></tr>
+    {% for c in configs %}
+    <tr>
+      <td>{{ c.modelo }}</td><td class="num">{{ c.total_gb|gb }}</td><td>{{ c.config }}</td>
+      <td class="num">{{ c.livres }}</td>
+      <td class="num"><a href="{{ url_for('maquinas', modelo=c.modelo if c.modelo != '(sem modelo)' else '') }}">{{ c.qtd }}</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+{% for g in grupos %}
+<div class="cartao">
+  <h3 style="margin-top:0">
+    <a href="{{ url_for('maquinas', modelo=g.modelo if g.modelo != '(sem modelo)' else '') }}">{{ g.modelo }}</a>
+    <span class="muted">· {{ g.qtd }} máquina(s) · média {{ '%.1f'|format(g.media_gb) }}GB</span>
+  </h3>
+  <p>
+    {% if g.spec %}
+      Especificação: {{ g.spec.slots }} slots, máx. {{ g.spec.max_gb|gb }}, {{ g.spec.tipo }}
+      {% if not g.spec.conferido %}<span class="tag amarelo">não conferida</span>{% endif %}
+    {% else %}<span class="tag amarelo">Sem especificação em modelos.json</span>{% endif %}
+  </p>
+  <p>
+    {% for cfg, n in g.configs %}<span class="tag cinza">{{ cfg }}: {{ n }}</span> {% endfor %}
+    · <span class="tag verde">{{ g.com_slot_livre }} com slot livre</span>
+    · <span class="tag amarelo">{{ g.com_upgrade }} com upgrade possível</span>
+  </p>
+  <table>
+    <tr><th>Máquina</th><th>Service tag</th><th>Usuário</th><th>Pentes</th><th class="num">Total</th><th class="num">Livres</th><th>Melhor upgrade</th></tr>
+    {% for a in g.maquinas %}
+    <tr>
+      <td>{{ a.maquina.nome }}</td><td>{{ a.maquina.service_tag or '—' }}</td><td>{{ a.maquina.usuario }}</td>
+      <td>{{ a.config }}</td><td class="num">{{ a.total_gb|gb }}</td><td class="num">{{ a.livres }}</td>
+      <td>{{ (a.upgrades[0]|upgrade) if a.upgrades else '—' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endfor %}
+{% endblock %}
